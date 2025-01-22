@@ -1,0 +1,16 @@
+
+```{r}
+#| label: load-packages
+
+library(tidyverse)
+library(knitr)
+```
+
+
+```{r}
+#| label: load-data
+
+load("~/sta470case1/data/yeast.RData")
+yeast <- y
+```
+
