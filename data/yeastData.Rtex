@@ -1,0 +1,224 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%    Yeast Image Analysis Data        %%
+%%             knitr doc               %%
+%% Last Modified  01/21/25 by ESI.     %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\documentclass{article}
+\usepackage{graphicx}
+\usepackage{fullpage}
+\usepackage{setspace}
+%\usepackage{comment} 
+\usepackage{rotating}
+\usepackage{color}
+%\usepackage{array}
+\usepackage{listings}
+\usepackage{hyperref}
+\usepackage{bm}
+\usepackage{natbib}
+\usepackage{filecontents}
+\newcommand{\rinline}[1]{Error w/ Knitr}
+\definecolor{red}{rgb}{1.0000000,0.0000000,0.0000000}
+\definecolor{orange}{rgb}{1.0000000,0.6470588,0.0000000}
+\definecolor{green}{rgb}{0.0000000,1.0000000,0.0000000}
+\definecolor{darkgreen}{rgb}{0.0000000,0.3921569,0.0000000}
+\definecolor{lightblue}{rgb}{0.6784314,0.8470588,0.9019608}
+\definecolor{blue}{rgb}{0.0000000,0.0000000,1.0000000}
+\definecolor{navy}{rgb}{0.0000000,0.0000000,0.5000000}
+\definecolor{purple}{rgb}{0.6274510,0.1254902,0.9411765}
+\definecolor{maroon}{rgb}{0.6901961,0.1882353,0.3764706}
+ 
+\title{Yeast Image Analysis Data}
+\author{Statistical Consulting Center, Department of Statistical Science, Duke University}
+\date{\today}
+\begin{document}
+%\SweaveOpts{concordance=TRUE}
+\maketitle
+
+\section{Import and Summarize the Data}
+
+
+%% begin.rcode setup,echo=F,messages=F,warnings=F
+%  ## ,results="hide"
+%  rm(list=ls()) ## Completely clear the workspace.
+%  opts_chunk$set(fig.path='./figs/',cache.path='./cache/')
+%  library(xtable)
+%  library(gplots)
+%  library(mclust)
+%  source("RFuncs.R")
+%% end.rcode
+
+%% begin.rcode input,echo=T
+%  system("du -h ThreeStrainsFourImagesTwoWells.csv")
+%  y<-read.csv("ThreeStrainsFourImagesTwoWells.csv",as.is=TRUE)
+%  dim(y)
+%  length(unique(y$ObjectNumber))
+%  summary(y$ObjectNumber)
+%  length(unique(y$FileName_CellPosition))
+%  y$strain<-substr(y$FileName_CellPosition,36,36)
+%  table(y$strain)
+%  y$well<-substr(y$FileName_CellPosition,37,38)
+%  table(y$well)
+%  img1<-substr(y$FileName_CellPosition,43,43)
+%  img2<-substr(y$FileName_CellPosition,48,48)
+%  y$image<-paste0(img1,".",img2)
+%  table(y$image)
+%  rm(img1,img2)
+%  length(unique(y$Number_Object_Number))
+%  dropme<-c("FileName_CellPosition","PathName_CellPosition",
+%            "Number_Object_Number","Location_Center_Z",
+%            "AreaShape_EulerNumber")
+%  y<-y[,!(colnames(y) %in% dropme)]
+%  y$uniqueWell<-paste0(y$strain,"-",y$well)
+%  y$uniqueImage<-paste0(y$uniqueWell,"-",y$image)
+%  y$uniqueID<-paste0(y$uniqueImage,"-",y$ObjectNumber)
+%  y<-y[,!(colnames(y) %in% c("image","well","ObjectNumber"))]
+%  length(unique(y$uniqueID))
+%  dim(y)
+%  rownames(y)<-y$uniqueID
+%  head(y)
+%  apply(is.na(y),2,sum)
+%% end.rcode
+
+Add counts of neighbors within 50 units (10 times the median object
+radius).  These computations are (necessarily) made within each image
+using the function {\texttt{nNN()}}, which is loaded from the input
+file {\texttt{RFuncs.R}}, but copied here.
+
+%% begin.rcode nNN,fig.width=6.5,fig.height=3.5
+%  ## Two measures of location are the same:
+%  cor(y$AreaShape_Center_X,y$Location_Center_X)
+%  cor(y$AreaShape_Center_Y,y$Location_Center_Y)
+%  ## BY-IMAGE computation:
+%  ## number of (nearest) neighbors (with centroids) within a ball of radius r
+%  ##   around each feature's centroid.
+%  ## nNN<-function(img,r){
+%  ##     y.i<-y[y$uniqueImage==img,c("Location_Center_X","Location_Center_Y")]
+%  ##     ## pairwise Euclidean distances
+%  ##     d.x<-(outer(y.i$Location_Center_X,y.i$Location_Center_X,FUN="-")^2)
+%  ##     d.y<-(outer(y.i$Location_Center_Y,y.i$Location_Center_X,FUN="-")^2)
+%  ##     dist<-sqrt(d.x + d.y)
+%  ##     dist<-(0.5*dist + 0.5*t(dist))
+%  ##     ## number of (all) neighbors within a ball of radius=r
+%  ##     n.nbrs<-apply(dist<r,1,sum)
+%  ##     return(n.nbrs)
+%  ## }
+%% end.rcode
+
+%% begin.rcode compNN,fig.width=6.5,fig.height=3.5
+%  ## median median = 5 for all:
+%  summary(y$AreaShape_MedianRadius[y$strain=="C"])
+%  summary(y$AreaShape_MedianRadius[y$strain=="D"])
+%  summary(y$AreaShape_MedianRadius[y$strain=="E"])
+%  ## diameter 10 each; in linear arrangement centers occur
+%  ##    at distance 2r=d from each other
+%  table(nNN(img="C-03-1.1",r=50))
+%  table(y$uniqueImage)
+%  uImage<-unique(y$uniqueImage)
+%  y$nNN50<-rep(NA,nrow(y))
+%  for (i in 1:length(uImage)){
+%      y[y$uniqueImage==uImage[i],"nNN50"]<-nNN(img=uImage[i],r=50)
+%  }
+%  table(y$nNN50,useNA="always")
+%  table(y$uniqueImage,y$nNN50,useNA="always")
+%% end.rcode
+
+%% begin.rcode NAME,fig.width=6.5,fig.height=3.5
+%% end.rcode
+
+\newpage
+\section{Hierarchical Agglomerative Clustering With \texttt{hclust()}}
+
+%% begin.rcode,fig.width=7.5, fig.height=6.5
+%  drop<-c("strain","uniqueWell","uniqueImage","uniqueID","AreaShape_Center_X","AreaShape_Center_Y","Location_Center_X","Location_Center_Y")
+%  keep<-(!(colnames(y) %in% drop))
+%  temp<-scale(y[,keep])
+%  ## image-level feature summaries
+%  f.medn<-matrix(NA,length(uImage),ncol(temp))
+%  colnames(f.medn)<-paste0(colnames(temp),".medn")
+%  for (i in 1:ncol(temp)){
+%      l.out<-unlist(lapply(split(temp[,i],y$uniqueImage),median,na.rm=TRUE))
+%      f.medn[,i]<-l.out
+%      if (i == 1) rownames(f.medn)<-names(l.out)
+%  }
+%% end.rcode
+
+\newpage
+\subsection{Average Linkage Clustering}
+
+%% begin.rcode,fig.width=7.5, fig.height=6.5
+%  h<-hclust(dist(f.medn),method="average")
+%  plot(h,main="Average Linkage",cex=0.4, cex.axis=0.4,cex.lab=0.4,las=1)
+%% end.rcode
+
+\newpage
+\subsection{Single Linkage Clustering}
+
+%% begin.rcode,fig.width=7.5, fig.height=6.5
+%  h<-hclust(dist(f.medn),method="single")
+%  plot(h,main="Single Linkage",cex=0.4, cex.axis=0.4,cex.lab=0.4,las=1)
+%% end.rcode
+
+\newpage
+\subsection{Complete Linkage Clustering}
+
+%% begin.rcode,fig.width=7.5, fig.height=6.5
+%  h<-hclust(dist(f.medn),method="complete")
+%  plot(h,main="Complete Linkage",cex=0.4, cex.axis=0.4,cex.lab=0.4,las=1)
+%% end.rcode
+
+\subsection{Three Group Classification}
+
+%% begin.rcode,fig.width=6.0, fig.height=6.5
+%  hc.class<-cutree(h,3)
+%  table(cutree(h,3))
+%% end.rcode
+
+\newpage
+\subsection{Heatmap}
+
+%% begin.rcode,fig.width=6.5, fig.height=7.5
+%  heatmap.2(as.matrix(f.medn),scale="none",trace="none",
+%            mar=c(15,6),cexCol=0.7)
+%% end.rcode
+
+
+%% begin.rcode,echo=F,messages=F,warnings=F,results="hide"
+%  save(y,nNN,file="yeast.RData")
+%  gc(); save.image() ## Do garbage collection and save workspace.
+%% end.rcode
+
+\end{document}
+
+This is a relatively unstructured assignment; it asks you to use your
+statistics knowledge base to creatively and effectively draw
+conclusions from a data set.
+
+Conduct an analysis of the yeast image data set for class on Wednesday
+1/29 using R.  The data are available in the file yeast.RData in the
+yeast image analysis Canvas module.  The goals here are for you to
+become familiar with the data set and to investigate four issues: (1)
+grouping/clustering; (2) feature selection/specification; (3) outlier
+identification; and (4) effective visualization of the data.  Address
+each of these areas in your analysis.  As a group, prepare 5--10 slides
+concisely describing your analysis and your key findings for
+presentation in class on 11/13.  Submit these as a PDF.
+
+
+
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% %%%%%%%                     References                       %%%%%%%
+\bibliographystyle{chicago}
+%% \bibliographystyle{/home/fac/iversen/lib/bibtex/chicago}
+\bibliography{SCC}
+
+
+
+\begin{figure}[!ht]
+    \begin{center}
+%%                                         trim = left bottom right top
+    \includegraphics[width=6.50in,page=1, trim=0.5in 6.5in 0in 0.650in, clip]{Table3MockUpFinal.pdf}
+    \end{center}
+    \caption{Mock--up of a replacement for Table 3.}
+    \label{fig:mocktable}
+\end{figure}
+
