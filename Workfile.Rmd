@@ -14,3 +14,19 @@ load("~/sta470case1/data/yeast.RData")
 yeast <- y
 ```
 
+```{r}
+#| label: nnn-dist
+
+yeast |> ggplot(aes(x = nNN50)) +
+  geom_histogram() +
+  facet_wrap(~ uniqueWell)
+```
+
+```{r}
+#| label: pca-area-concavity
+
+pca_results <- prcomp(yeast |> filter(uniqueWell == "C-03") |> select(AreaShape_Area, AreaShape_Perimeter), scale = TRUE)
+
+pca_scores <- data.frame(pca_results$x) |> summarize(PC1 = mean(PC1), PC2 = mean(PC2))
+```
+
