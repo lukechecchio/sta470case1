@@ -24,9 +24,18 @@ yeast |> ggplot(aes(x = nNN50)) +
 
 ```{r}
 #| label: pca-area-concavity
+unique_wells <- unique(yeast$uniqueWell)
 
-pca_results <- prcomp(yeast |> filter(uniqueWell == "C-03") |> select(AreaShape_Area, AreaShape_Perimeter), scale = TRUE)
+pca_scores <- tibble(PC1 = c(), PC2 = c())
 
-pca_scores <- data.frame(pca_results$x) |> summarize(PC1 = mean(PC1), PC2 = mean(PC2))
+for(unique_well in unique_wells) {
+  temp_pca_results <- prcomp(yeast |> filter(uniqueWell == unique_well) |> select(!c(strain, uniqueWell, uniqueImage, uniqueID)), scale = TRUE)
+  temp_pca_scores <- data.frame(pca_results$x[, 1:2]) |> summarize(PC1 = sum(PC1), PC2 = sum(PC2))
+  rownames(temp_pca_scores) <- unique_well
+  
+  pca_scores <- rbind(pca_scores, temp_pca_scores)
+}
+
+
 ```
 
