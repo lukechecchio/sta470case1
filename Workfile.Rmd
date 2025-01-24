@@ -24,18 +24,23 @@ yeast |> ggplot(aes(x = nNN50)) +
 
 ```{r}
 #| label: pca-area-concavity
-unique_wells <- unique(yeast$uniqueWell)
+unique_imgs <- unique(yeast$uniqueImage)
 
-pca_scores <- tibble(PC1 = c(), PC2 = c())
+pca_scores <- tibble(PC1 = c(), PC2 = c(), PC3 = c(), PC4 = c())
 
-for(unique_well in unique_wells) {
-  temp_pca_results <- prcomp(yeast |> filter(uniqueWell == unique_well) |> select(!c(strain, uniqueWell, uniqueImage, uniqueID)), scale = TRUE)
-  temp_pca_scores <- data.frame(pca_results$x[, 1:2]) |> summarize(PC1 = sum(PC1), PC2 = sum(PC2))
-  rownames(temp_pca_scores) <- unique_well
+for(unique_img in unique_imgs) {
+  
+  temp_pca_results <- prcomp(yeast |> filter(uniqueImage == unique_img) |> 
+                               select(AreaShape_Perimeter, AreaShape_EquivalentDiameter, AreaShape_ConvexArea, AreaShape_Solidity), scale = TRUE)
+  temp_pca_scores <- data.frame(temp_pca_results$x) |> summarize(PC1 = median(PC1), PC2 = median(PC2), PC3 = median(PC3), PC4 = median(PC4))
+  rownames(temp_pca_scores) <- unique_img
   
   pca_scores <- rbind(pca_scores, temp_pca_scores)
 }
 
+dist_matrix <- dist(pca_scores)
+hc <- hclust(dist_matrix, method = "ward.D2")
 
+plot(as.dendrogram(hc))
 ```
 
