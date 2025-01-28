@@ -1,0 +1,103 @@
+---
+title: "Analysis"
+author: ""
+format: html
+editor: visual
+---
+
+Overview of Data
+
+```{r}
+load("./data/yeast.RData")
+
+str(y)  # Check the structure of the dataset
+summary(y)  # Summary statistics
+```
+
+# 1. Grouping/Clustering
+
+The pdf shared in class (also in the data folder) does a better job then I will ever do for this
+
+# 2. Feature Selection/Specification
+
+Using PCA
+
+```{r}
+pca <- prcomp(data_scaled, center = TRUE, scale. = TRUE)
+summary(pca)
+```
+
+```{r}
+biplot(pca, main = "PCA Biplot", cex = 0.6)
+```
+
+```{r}
+loadings <- abs(pca$rotation[, 1])  # Focus on PC1
+important_features <- names(sort(loadings, decreasing = TRUE)[1:5])
+important_features
+```
+
+# Outlier Identification
+
+-   Use Mahalanobis Distance?- <https://www.machinelearningplus.com/statistics/mahalanobis-distance/>
+
+    -    It transforms the columns into uncorrelated variables
+
+    -   Scale the columns to make their variance equal to 1
+
+    -   Finally, it calculates the Euclidean distance.
+
+-   If we stick with this, need to find scholarly source for citation (one idea: **APA Citation:**
+    Mahalanobis, P. C. (1936). On the generalised distance in statistics. *Proceedings of the National Institute of Sciences of India,* 2(1), 49–55.)
+
+-   Euclidean Distance for now
+
+    ```{r}
+    euc_dist <- apply(data_scaled, 1, function(x) sqrt(sum(x^2)))
+    threshold <- quantile(euc_dist, 0.99)  # Top 1% as outliers
+    outliers <- which(euc_dist > threshold)
+    ```
+
+```{r}
+y$Outlier <- ifelse(1:nrow(y) %in% outliers, TRUE, FALSE)
+```
+
+# 4 - Visualization
+
+```{r}
+library(ggplot2)
+```
+
+Visualize clusters using first two PCA components
+
+```{r}
+pca_data <- data.frame(pca$x[, 1:2], Cluster = y$Cluster)
+ggplot(pca_data, aes(PC1, PC2, color = Cluster)) +
+  geom_point(alpha = 0.6) +
+  labs(title = "Cluster Visualization using PCA", x = "PC1", y = "PC2") +
+  theme_minimal()
+```
+
+Visualize Outliers:
+
+```{r}
+outlier_data <- data.frame(y, Euclidean_Distance = euc_dist)
+ggplot(outlier_data, aes(x = Euclidean_Distance, fill = Outlier)) +
+  geom_histogram(bins = 30, alpha = 0.6) +
+  labs(title = "Outlier Detection", x = "Euclidean Distance", y = "Count") +
+  theme_minimal()
+```
+
+-   The majority of the data has a low Euclidean distance, forming a right-skewed distribution.
+
+-   The blue bars represent detected outliers, which are on the far right, meaning they have significantly higher Euclidean distances compared to the rest.
+
+-   The outliers are few and exist at extreme values, indicating the top 1% threshold successfully isolates anomalies.
+
+-   Causes of outliers?: could be due to measurement errors, rare yeast morphologies, or misclassified samples.
+
+Save cluster assigments / outlier data for later:
+
+```{r}
+write.csv(y, "yeast_analysis_results.csv", row.names = FALSE)
+```
