@@ -8,10 +8,18 @@ editor: visual
 Overview of Data
 
 ```{r}
+library(tidyverse)
+library(knitr) 
+
 load("./data/yeast.RData")
 
 str(y)  # Check the structure of the dataset
 summary(y)  # Summary statistics
+
+cor(y$Location_Center_X, y$AreaShape_Center_X) # 100% correlated
+
+data_scaled <- data.frame(scale(y[, sapply(y, is.numeric)])) |> select(!c(Location_Center_X,
+                                                              Location_Center_Y))
 ```
 
 # 1. Grouping/Clustering
@@ -24,31 +32,58 @@ Using PCA
 
 ```{r}
 pca <- prcomp(data_scaled, center = TRUE, scale. = TRUE)
-summary(pca)
+sum <- summary(pca)
+data.frame(sum$importance) |> select(PC1, PC2, PC3, PC4, PC5, PC6) |> kable()
 ```
 
 ```{r}
 biplot(pca, main = "PCA Biplot", cex = 0.6)
+
+# Make pca plot using well?
+# Separate loading plot
 ```
 
 ```{r}
-loadings <- abs(pca$rotation[, 1])  # Focus on PC1
+var_explained <- pca$sdev^2 / sum(pca$sdev^2)
+sum(var_explained[1:6])
+
+ggplot(data = data.frame(PC = 1:length(var_explained), 
+                         Variance = var_explained),
+       aes(x = PC, y = Variance)) +
+  geom_line() +
+  geom_point(size = 4) +
+  geom_text(aes(label = round(Variance, 2)), vjust = -0.5) +
+  scale_x_continuous(breaks = 1:length(var_explained)) +
+  xlab("Principal Component") +
+  ylab("Proportion of Variance Explained") +
+  ggtitle("Scree Plot") +
+  theme_minimal()
+```
+
+```{r}
+loadings <- abs(pca$rotation[, 1:6])  # Focus on PC1
 important_features <- names(sort(loadings, decreasing = TRUE)[1:5])
 important_features
+
+loadings_mod <- data.frame(loadings) |> mutate(weighted = PC1 * var_explained[1] +
+                                     PC2 * var_explained[2] +
+                                     PC3 * var_explained[3] +
+                                     PC4 * var_explained[4] +
+                                     PC5 * var_explained[5] +
+                                     PC6 * var_explained[6])
 ```
 
 # Outlier Identification
 
 -   Use Mahalanobis Distance?- <https://www.machinelearningplus.com/statistics/mahalanobis-distance/>
 
-    -    It transforms the columns into uncorrelated variables
+    -   It transforms the columns into uncorrelated variables
 
     -   Scale the columns to make their variance equal to 1
 
     -   Finally, it calculates the Euclidean distance.
 
--   If we stick with this, need to find scholarly source for citation (one idea: **APA Citation:**
-    Mahalanobis, P. C. (1936). On the generalised distance in statistics. *Proceedings of the National Institute of Sciences of India,* 2(1), 49–55.)
+-   If we stick with this, need to find scholarly source for citation (one idea: **APA Citation:** Mahalanobis, P. C. (1936). On the generalised distance in statistics. *Proceedings of the National Institute of Sciences of India,* 2(1), 49–55.)
 
 -   Euclidean Distance for now
 
