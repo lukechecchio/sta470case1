@@ -64,7 +64,7 @@ biplot(pca, main = "PCA Biplot", cex = 0.6)
 # Make pca plot using well?
 # Separate loading plot
 
-autoplot(pca, data = y, color = "strain", alpha = 0.5)
+autoplot(pca, data = y, color = "strain", alpha = 0.5) + labs(title = "PCA Plot", color = "Strain")
 ```
 
 ```{r}
