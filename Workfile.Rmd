@@ -4,13 +4,14 @@
 
 library(tidyverse)
 library(knitr)
+library(ggplot2)
 ```
 
 
 ```{r}
 #| label: load-data
 
-load("~/sta470case1/data/yeast.RData")
+load("~/R proj/sta470case1/data/yeast.RData")
 yeast <- y
 ```
 
@@ -42,5 +43,69 @@ dist_matrix <- dist(pca_scores)
 hc <- hclust(dist_matrix, method = "ward.D2")
 
 plot(as.dendrogram(hc))
+```
+
+```{r}
+set.seed(201)
+
+sampled_y <- y |>
+  group_by(uniqueWell) |>
+  sample_n(300) |>
+  ungroup()
+
+y_num <- sampled_y |>
+  select(where(is.numeric))
+
+# Perform PCA
+pca_result <- prcomp(y_num, center = TRUE, scale. = TRUE)  
+
+componentselect <- c(1, 2, 3, 4)
+
+# Extract the first few principal components (e.g., first 5 PCs)
+pca_scores <- as.data.frame(pca_result$x[, componentselect])  # Use first 5 PCs
+
+# Compute distance matrix from PCA scores
+dist_matrix <- dist(pca_scores)  
+
+# Perform Classical MDS (Metric MDS)
+mds_result <- cmdscale(dist_matrix, k = 2)  # Reduce to 2D
+
+# Convert to dataframe and re-add category for coloring
+mds_df <- as.data.frame(mds_result)
+mds_df$Strain <- sampled_y[, 27]  # Re-add Strain
+
+# Rename columns
+colnames(mds_df)[1:2] <- c("MDS1", "MDS2")
+
+# Plot MDS with colors for categories
+ggplot(mds_df, aes(x = MDS1, y = MDS2, color = Strain$strain)) +
+  geom_point(size = 3, alpha = 0.7) +
+  theme_minimal() +
+  labs(title = "MDS from PCA", x = "MDS1", y = "MDS2")
+```
+```{r}
+# Example dataframe `y` (replace with your actual dataframe)
+# Assuming first column is the identifier (ID)
+y_pca_data <- y |>
+  select(where(is.numeric))  # Remove identifier column
+
+# Convert categorical variables to numeric (if necessary)
+# If you have categorical variables, use model.matrix() or dummy encoding before PCA
+
+# Standardize data (PCA works best when data is scaled)
+y_pca_data <- scale(y_pca_data)
+
+# Perform PCA
+pca_result <- prcomp(y_pca_data, center = TRUE, scale. = TRUE)
+
+# View PCA summary
+summary(pca_result)
+
+# Scree plot to visualize variance explained
+plot(pca_result, type = "l")
+
+# Biplot visualization
+biplot(pca_result)
+
 ```
 
