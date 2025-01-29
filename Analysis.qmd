@@ -50,7 +50,7 @@ plot(hc_result, main = "Hierarchical Clustering on First 6 PCs", xlab = "", sub 
 heatmap.2(as.matrix(pc_scores_sum),scale="none",trace="none",
           cexCol=1)
 
-drop <- rownames(loadings_mod_final)[6:26]
+drop <- rownames(loadings_mod_final)[11:26]
 keep <- (!(colnames(y) %in% drop))
 
 temp <- y[,keep]
@@ -63,6 +63,9 @@ dist_matrix <- dist(temp_sum)
 
 hc_result <- hclust(dist_matrix, method = "complete")
 plot(hc_result, main = "Hierarchical Clustering on Important Features", xlab = "", sub = "")
+
+heatmap.2(as.matrix(temp_sum),scale="none",trace="none",
+          cexCol=1)
 ```
 
 # 2. Feature Selection/Specification
