@@ -94,6 +94,30 @@ data.frame(sum$importance) |> select(PC1, PC2, PC3, PC4, PC5, PC6) |> kable(digi
 - Explain weighted loading metric to determine importance across first six PCs
 - Identify important features based on this
 
+
+### PCA cont.
+
+```{r}
+#| label: weighted-loadings
+#| echo: FALSE
+#| warning: FALSE
+#| message: FALSE
+
+var_explained <- pca$sdev^2 / sum(pca$sdev^2)
+
+loadings <- abs(pca$rotation[, 1:6])  # Focus on PC1-6
+
+loadings_mod <- data.frame(loadings) |> mutate(weighted = PC1 * var_explained[1] +
+                                     PC2 * var_explained[2] +
+                                     PC3 * var_explained[3] +
+                                     PC4 * var_explained[4] +
+                                     PC5 * var_explained[5] +
+                                     PC6 * var_explained[6])
+
+loadings_mod |> select(weighted) |> arrange(desc(weighted)) |> kable(digits = 3)
+```
+
+
 # Outlier Identification
 
 - Want to mention potential use of Mahalanobis Distance
