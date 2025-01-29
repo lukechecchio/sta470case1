@@ -15,8 +15,63 @@ header-includes:
 ---
 
 # Data Grouping/Clustering
+##
 
-- Copy stuff from Iversen for now? Not able to make more progress it seems
+### Process
+
+- Building on exploratory work by Dr. Iversen
+- Wanted to explore whether there was clustering amongst images across first 6 principal components (explained later)
+- Extracted PC scores for the first six PCs for each observation
+- Calculated median PC scores for the first six PCs for each image
+- Used `hclust()` with complete linkage to visualize clustering
+- Used `heatmap.2()` to further visualize clustering amongst the images and PCs
+
+### Results
+
+```{r}
+#| label: PCA-clusters
+#| echo: FALSE
+#| warning: FALSE
+#| message: FALSE
+
+library(tidyverse)
+library(knitr) 
+library(ggfortify)
+library(gplots)
+
+load("./data/yeast.RData")
+data_scaled <- data.frame(scale(y[, sapply(y, is.numeric)])) |> select(!c(Location_Center_X,
+                                                              Location_Center_Y))
+
+pca <- prcomp(data_scaled, center = TRUE, scale. = TRUE)
+
+pc_scores <- pca$x[, 1:6]
+pc_scores_new <- data.frame(pc_scores) |> rownames_to_column(var = "rowname") |>
+  mutate(img = substring(rowname, 0, 8)) |>
+  select(!rowname)
+
+pc_scores_sum <- pc_scores_new |> group_by(img) |>
+  summarize(PC1.medn = median(PC1), PC2.medn = median(PC2), PC3.medn = median(PC3),
+            PC4.medn = median(PC4), PC5.medn = median(PC5), PC6.medn = median(PC6)) |>
+  column_to_rownames(var = "img")
+dist_matrix <- dist(pc_scores_sum)
+
+
+hc_result <- hclust(dist_matrix, method = "complete")
+plot(hc_result, main = "Hierarchical Clustering on First 6 PCs", xlab = "", sub = "")
+```
+
+### Results
+
+```{r}
+#| label: PCA-heatmap
+#| echo: FALSE
+#| warning: FALSE
+#| message: FALSE
+
+heatmap.2(as.matrix(pc_scores_sum),scale="none",trace="none",
+          cexCol=1)
+```
 
 # Feature Selection/Specification
 ## 
@@ -36,3 +91,4 @@ header-includes:
 # Data Visualization
 
 - Add plots visualizing important features relationships with strain/well/image
+
