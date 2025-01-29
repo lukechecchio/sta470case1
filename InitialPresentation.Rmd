@@ -1,0 +1,38 @@
+---
+title: "Exploratory Analysis of Yeast Image Data"
+author: Austin Chang, Luke Checchio, Daniel Cohen
+date: Jan 28, 2025
+output: 
+  beamer_presentation:
+    incremental: false  
+    theme: "Frankfurt"  
+    colortheme: "rose"  
+    toc: true   
+    slide_level: 3
+    keep_tex: true
+header-includes: 
+- \AtBeginSubsection{}
+---
+
+# Data Grouping/Clustering
+
+- Copy stuff from Iversen for now? Not able to make more progress it seems
+
+# Feature Selection/Specification
+## 
+
+### Principal Component Analysis
+
+- Include Skree plot or kable output from `prcomp()`
+- Explain decision to include first six PCs (>95% cum. variance explained)
+- Explain weighted loading metric to determine importance across first six PCs
+- Identify important features based on this
+
+# Outlier Identification
+
+- Want to mention potential use of Mahalanobis Distance
+- For now, using Euclidean distance
+
+# Data Visualization
+
+- Add plots visualizing important features relationships with strain/well/image
