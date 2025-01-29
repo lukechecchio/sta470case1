@@ -19,6 +19,7 @@ str(y)  # Check the structure of the dataset
 summary(y)  # Summary statistics
 
 cor(y$Location_Center_X, y$AreaShape_Center_X) # 100% correlated
+cor(y$Location_Center_Y, y$AreaShape_Center_Y) # 100% correlated
 
 data_scaled <- data.frame(scale(y[, sapply(y, is.numeric)])) |> select(!c(Location_Center_X,
                                                               Location_Center_Y))
