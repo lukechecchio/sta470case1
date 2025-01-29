@@ -21,6 +21,8 @@ summary(y)  # Summary statistics
 cor(y$Location_Center_X, y$AreaShape_Center_X) # 100% correlated
 cor(y$Location_Center_Y, y$AreaShape_Center_Y) # 100% correlated
 
+y <- y |> select(!c(Location_Center_X, Location_Center_Y))
+
 data_scaled <- data.frame(scale(y[, sapply(y, is.numeric)])) |> select(!c(Location_Center_X,
                                                               Location_Center_Y))
 ```
@@ -47,6 +49,20 @@ plot(hc_result, main = "Hierarchical Clustering on First 6 PCs", xlab = "", sub 
 
 heatmap.2(as.matrix(pc_scores_sum),scale="none",trace="none",
           cexCol=1)
+
+drop <- rownames(loadings_mod_final)[6:26]
+keep <- (!(colnames(y) %in% drop))
+
+temp <- y[,keep]
+
+temp_sum <- temp |> group_by(uniqueImage) |>
+  summarise(across(where(is.numeric), ~median(., na.rm = TRUE))) |>
+  column_to_rownames(var = "uniqueImage")
+dist_matrix <- dist(temp_sum)
+
+
+hc_result <- hclust(dist_matrix, method = "complete")
+plot(hc_result, main = "Hierarchical Clustering on Important Features", xlab = "", sub = "")
 ```
 
 # 2. Feature Selection/Specification
@@ -95,7 +111,10 @@ loadings_mod <- data.frame(loadings) |> mutate(weighted = PC1 * var_explained[1]
                                      PC5 * var_explained[5] +
                                      PC6 * var_explained[6])
 
-loadings_mod |> select(weighted) |> arrange(desc(weighted)) |> kable(digits = 3)
+loadings_mod_final <- loadings_mod |> select(weighted) |> arrange(desc(weighted)) 
+
+
+loadings_mod_final |> kable(digits = 3)
 ```
 
 # Outlier Identification
