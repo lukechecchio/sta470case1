@@ -78,6 +78,17 @@ heatmap.2(as.matrix(pc_scores_sum),scale="none",trace="none",
 
 ### Principal Component Analysis
 
+```{r}
+#| label: PCA-importance
+#| echo: FALSE
+#| warning: FALSE
+#| message: FALSE
+
+sum <- summary(pca)
+data.frame(sum$importance) |> select(PC1, PC2, PC3, PC4, PC5, PC6) |> kable(digits = 3)
+```
+
+
 - Include Skree plot or kable output from `prcomp()`
 - Explain decision to include first six PCs (>95% cum. variance explained)
 - Explain weighted loading metric to determine importance across first six PCs
