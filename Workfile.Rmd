@@ -46,6 +46,7 @@ plot(as.dendrogram(hc))
 ```
 
 ```{r}
+#|label: MDS of stratified sampled data
 set.seed(201)
 
 sampled_y <- y |>
@@ -59,6 +60,7 @@ y_num <- sampled_y |>
 # Perform PCA
 pca_result <- prcomp(y_num, center = TRUE, scale. = TRUE)  
 
+# Select which components to use
 componentselect <- c(1, 2, 3, 4)
 
 # Extract the first few principal components (e.g., first 5 PCs)
@@ -84,6 +86,7 @@ ggplot(mds_df, aes(x = MDS1, y = MDS2, color = Strain$strain)) +
   labs(title = "MDS from PCA", x = "MDS1", y = "MDS2")
 ```
 ```{r}
+#|label: component results
 # Example dataframe `y` (replace with your actual dataframe)
 # Assuming first column is the identifier (ID)
 y_pca_data <- y |>
@@ -107,5 +110,47 @@ plot(pca_result, type = "l")
 # Biplot visualization
 biplot(pca_result)
 
+```
+```{r}
+#|label: strain C distributions by well
+# MDS of stratified sampled data
+set.seed(201)
+
+StrainC_y <- y |>
+  filter(strain == 'C') |>
+  group_by(uniqueWell) |>
+  sample_n(300) |>
+  ungroup()
+
+y_num_C <- StrainC_y |>
+  select(where(is.numeric))
+
+# Perform PCA
+pca_result_C <- prcomp(y_num_C, center = TRUE, scale. = TRUE)  
+
+# Select which components to use
+componentselect <- c(1, 2, 3, 4)
+
+# Extract the first few principal components (e.g., first 5 PCs)
+pca_scores_C <- as.data.frame(pca_result_C$x[, componentselect])  # Use first 5 PCs
+
+# Compute distance matrix from PCA scores
+dist_matrix_C <- dist(pca_scores_C)  
+
+# Perform Classical MDS (Metric MDS)
+mds_result_C <- cmdscale(dist_matrix_C, k = 2)  # Reduce to 2D
+
+# Convert to dataframe and re-add category for coloring
+mds_df_C <- as.data.frame(mds_result_C)
+mds_df_C$well <- StrainC_y[, 28]  # Re-add well
+
+# Rename columns
+colnames(mds_df_C)[1:2] <- c("MDS1", "MDS2")
+
+# Plot MDS with colors for categories
+ggplot(mds_df_C, aes(x = MDS1, y = MDS2, color = well$uniqueWell)) +
+  geom_point(size = 3, alpha = 0.7) +
+  theme_minimal() +
+  labs(title = "MDS from PCA", x = "MDS1", y = "MDS2")
 ```
 
