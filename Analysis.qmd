@@ -85,9 +85,7 @@ ggplot(data = data.frame(PC = 1:length(var_explained),
 ```
 
 ```{r}
-loadings <- abs(pca$rotation[, 1:6])  # Focus on PC1
-important_features <- names(sort(loadings, decreasing = TRUE)[1:5])
-important_features
+loadings <- abs(pca$rotation[, 1:6])  # Focus on PC1-6
 
 loadings_mod <- data.frame(loadings) |> mutate(weighted = PC1 * var_explained[1] +
                                      PC2 * var_explained[2] +
@@ -95,6 +93,8 @@ loadings_mod <- data.frame(loadings) |> mutate(weighted = PC1 * var_explained[1]
                                      PC4 * var_explained[4] +
                                      PC5 * var_explained[5] +
                                      PC6 * var_explained[6])
+
+loadings_mod |> select(weighted) |> arrange(desc(weighted)) |> kable(digits = 3)
 ```
 
 # Outlier Identification
