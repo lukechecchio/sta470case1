@@ -85,33 +85,35 @@ summary(aov(AreaShape_Solidity ~ strain, data = yeast))
 
 # not significant
 
-yeast |> ggplot(aes(x = AreaShape_BoundingBoxMaximum_X, y = strain)) + geom_boxplot()
-summary(aov(AreaShape_BoundingBoxMaximum_X ~ strain, data = yeast))
-
-yeast |> ggplot(aes(x = AreaShape_BoundingBoxMaximum_Y, y = strain)) + geom_boxplot()
-summary(aov(AreaShape_BoundingBoxMaximum_Y ~ strain, data = yeast))
-
-yeast |> ggplot(aes(x = AreaShape_BoundingBoxMinimum_X, y = strain)) + geom_boxplot()
-summary(aov(AreaShape_BoundingBoxMinimum_X ~ strain, data = yeast))
-
-yeast |> ggplot(aes(x = AreaShape_BoundingBoxMinimum_Y, y = strain)) + geom_boxplot()
-summary(aov(AreaShape_BoundingBoxMinimum_Y ~ strain, data = yeast))
-
-yeast |> ggplot(aes(x = AreaShape_Center_X, y = strain)) + geom_boxplot()
-summary(aov(AreaShape_Center_X ~ strain, data = yeast))
-
-yeast |> ggplot(aes(x = AreaShape_Center_Y, y = strain)) + geom_boxplot()
-summary(aov(AreaShape_Center_Y ~ strain, data = yeast))
-
-yeast |> ggplot(aes(x = nNN50, y = strain)) + geom_boxplot()
-summary(aov(nNN50 ~ strain, data = yeast))
+# yeast |> ggplot(aes(x = AreaShape_BoundingBoxMaximum_X, y = strain)) + geom_boxplot()
+# summary(aov(AreaShape_BoundingBoxMaximum_X ~ strain, data = yeast))
+# 
+# yeast |> ggplot(aes(x = AreaShape_BoundingBoxMaximum_Y, y = strain)) + geom_boxplot()
+# summary(aov(AreaShape_BoundingBoxMaximum_Y ~ strain, data = yeast))
+# 
+# yeast |> ggplot(aes(x = AreaShape_BoundingBoxMinimum_X, y = strain)) + geom_boxplot()
+# summary(aov(AreaShape_BoundingBoxMinimum_X ~ strain, data = yeast))
+# 
+# yeast |> ggplot(aes(x = AreaShape_BoundingBoxMinimum_Y, y = strain)) + geom_boxplot()
+# summary(aov(AreaShape_BoundingBoxMinimum_Y ~ strain, data = yeast))
+# 
+# yeast |> ggplot(aes(x = AreaShape_Center_X, y = strain)) + geom_boxplot()
+# summary(aov(AreaShape_Center_X ~ strain, data = yeast))
+# 
+# yeast |> ggplot(aes(x = AreaShape_Center_Y, y = strain)) + geom_boxplot()
+# summary(aov(AreaShape_Center_Y ~ strain, data = yeast))
+# 
+# yeast |> ggplot(aes(x = nNN50, y = strain)) + geom_boxplot()
+# summary(aov(nNN50 ~ strain, data = yeast))
 
 ```
 
 ```{r}
+#| label: data-transform
+
 drop <- c("AreaShape_BoundingBoxMaximum_X", "AreaShape_BoundingBoxMaximum_Y", "AreaShape_BoundingBoxMinimum_X", "AreaShape_BoundingBoxMinimum_Y", "AreaShape_Center_X", "AreaShape_Center_Y", "nNN50")
 
-yeast <- yeast |> select(!(all_of(drop)))
+yeast <- yeast |> select(!(all_of(drop))) |> filter(!(uniqueImage %in% c("C-03-1.2", "C-03-1.3", "C-03-2.1", "D-03-1.1", "D-03-1.2", "D-03-2.1")))
 data_scaled_new <- data.frame(scale(yeast[, sapply(yeast, is.numeric)]))
 
 covariance <- cov(data_scaled_new)
@@ -126,6 +128,91 @@ covariance |> kable(digits = 2)
 # orientation
 
 # take based off f-value in ANOVA (explains most difference between groups): perimeter, formfactor, eccentricity, extent, orientation
+```
+
+```{r}
+#| label: feature-anova
+
+# significant
+
+yeast |> ggplot(aes(x = AreaShape_Area, y = strain)) + geom_boxplot()
+summary(aov(AreaShape_Area ~ strain, data = yeast))
+
+yeast |> ggplot(aes(x = AreaShape_Compactness, y = strain)) + geom_boxplot()
+summary(aov(AreaShape_Compactness ~ strain, data = yeast))
+
+yeast |> ggplot(aes(x = AreaShape_Eccentricity, y = strain)) + geom_boxplot()
+summary(aov(AreaShape_Eccentricity ~ strain, data = yeast))
+
+yeast |> ggplot(aes(x = AreaShape_Extent, y = strain)) + geom_boxplot()
+summary(aov(AreaShape_Extent ~ strain, data = yeast))
+
+yeast |> ggplot(aes(x = AreaShape_FormFactor, y = strain)) + geom_boxplot()
+summary(aov(AreaShape_FormFactor ~ strain, data = yeast))
+
+yeast |> ggplot(aes(x = AreaShape_MaxFeretDiameter, y = strain)) + geom_boxplot()
+summary(aov(AreaShape_MaxFeretDiameter ~ strain, data = yeast))
+
+yeast |> ggplot(aes(x = AreaShape_MaximumRadius, y = strain)) + geom_boxplot()
+summary(aov(AreaShape_MaximumRadius ~ strain, data = yeast))
+
+yeast |> ggplot(aes(x = AreaShape_MeanRadius, y = strain)) + geom_boxplot()
+summary(aov(AreaShape_MeanRadius ~ strain, data = yeast))
+
+yeast |> ggplot(aes(x = AreaShape_MedianRadius, y = strain)) + geom_boxplot()
+summary(aov(AreaShape_MedianRadius ~ strain, data = yeast))
+
+yeast |> ggplot(aes(x = AreaShape_MinorAxisLength, y = strain)) + geom_boxplot()
+summary(aov(AreaShape_MinorAxisLength ~ strain, data = yeast))
+
+yeast |> ggplot(aes(x = AreaShape_Orientation, y = strain)) + geom_boxplot()
+summary(aov(AreaShape_Orientation ~ strain, data = yeast))
+
+yeast |> ggplot(aes(x = AreaShape_Solidity, y = strain)) + geom_boxplot()
+summary(aov(AreaShape_Solidity ~ strain, data = yeast))
+
+# not significant
+
+yeast |> ggplot(aes(x = AreaShape_BoundingBoxArea, y = strain)) + geom_boxplot()
+summary(aov(AreaShape_BoundingBoxArea ~ strain, data = yeast))
+
+yeast |> ggplot(aes(x = AreaShape_ConvexArea, y = strain)) + geom_boxplot()
+summary(aov(AreaShape_ConvexArea ~ strain, data = yeast))
+
+yeast |> ggplot(aes(x = AreaShape_EquivalentDiameter, y = strain)) + geom_boxplot()
+summary(aov(AreaShape_EquivalentDiameter ~ strain, data = yeast))
+
+yeast |> ggplot(aes(x = AreaShape_MajorAxisLength, y = strain)) + geom_boxplot()
+summary(aov(AreaShape_MajorAxisLength ~ strain, data = yeast))
+
+yeast |> ggplot(aes(x = AreaShape_MinFeretDiameter, y = strain)) + geom_boxplot()
+summary(aov(AreaShape_MinFeretDiameter ~ strain, data = yeast))
+
+yeast |> ggplot(aes(x = AreaShape_Perimeter, y = strain)) + geom_boxplot()
+summary(aov(AreaShape_Perimeter ~ strain, data = yeast))
+
+```
+
+```{r}
+#| label: data-transform-again
+
+drop <- c("AreaShape_BoundingBoxArea", "AreaShape_ConvexArea", "AreaShape_EquivalentDiameter", "AreaShape_MajorAxisLength", "AreaShape_MinFeretDiameter", "AreaShape_Perimeter")
+
+yeast <- yeast |> select(!(all_of(drop)))
+data_scaled_new <- data.frame(scale(yeast[, sapply(yeast, is.numeric)]))
+
+covariance <- cov(data_scaled_new)
+
+covariance |> kable(digits = 2)
+
+# highly correlated variables
+# area, maxferetdiameter, maximumradius, meanradius, medianradius, minoraxislength
+# compactness, formfactor, solidity
+# eccentricity
+# extent
+# orientation
+
+# take based off f-value in ANOVA (explains most difference between groups): medianradius, formfactor, eccentricity, extent, orientation
 ```
 
 ```{r}
@@ -165,17 +252,23 @@ loadings_mod_final |> kable(digits = 3)
 ```{r}
 #| label: new-cluster-analysis
 
-# temp <- yeast |> select(AreaShape_Perimeter, AreaShape_FormFactor, AreaShape_Eccentricity, AreaShape_Extent, AreaShape_Orientation, strain, uniqueWell, uniqueImage, uniqueID) |> mutate(across(where(is.numeric), scale))
-# 
-# temp_full <- temp |> group_by(uniqueImage) |>
-#    summarise(across(where(is.numeric), ~median(., na.rm = TRUE))) |>
-#    column_to_rownames(var = "uniqueImage")
+# analysis with all data
 
+## using anova f-scores
+temp <- yeast |> select(AreaShape_Perimeter, AreaShape_FormFactor, AreaShape_Eccentricity, AreaShape_Extent, AreaShape_Orientation, strain, uniqueWell, uniqueImage, uniqueID) |> mutate(across(where(is.numeric), scale))
+
+temp_full <- temp |> group_by(uniqueImage) |>
+   summarise(across(where(is.numeric), ~median(., na.rm = TRUE))) |>
+   column_to_rownames(var = "uniqueImage")
+
+## using weighted importance
 temp <- yeast |> select(AreaShape_MeanRadius, AreaShape_FormFactor, AreaShape_Eccentricity, AreaShape_Extent, AreaShape_Orientation, strain, uniqueWell, uniqueImage, uniqueID) |> mutate(across(where(is.numeric), scale))
 
 temp_full <- temp |> group_by(uniqueImage) |>
    summarise(across(where(is.numeric), ~median(., na.rm = TRUE))) |>
    column_to_rownames(var = "uniqueImage")
+
+# standarding orientation across strain (probably not kosher)
 
 # temp <- yeast |> select(AreaShape_Perimeter, AreaShape_FormFactor, AreaShape_Eccentricity, AreaShape_Extent, strain, uniqueWell, uniqueImage, uniqueID) |> mutate(across(where(is.numeric), scale))
 # 
@@ -192,6 +285,24 @@ temp_full <- temp |> group_by(uniqueImage) |>
 #   column_to_rownames(var = "uniqueImage") |>
 #   select(!uniqueWell)
 
+# adding new analysis with images removed
+
+## using anova f-scores
+temp <- yeast |> select(AreaShape_MedianRadius, AreaShape_FormFactor, AreaShape_Eccentricity, AreaShape_Extent, AreaShape_Orientation, strain, uniqueWell, uniqueImage, uniqueID) |> mutate(across(where(is.numeric), scale))
+
+temp_full <- temp |> group_by(uniqueImage) |>
+   summarise(across(where(is.numeric), ~median(., na.rm = TRUE))) |>
+   column_to_rownames(var = "uniqueImage")
+
+## using weighted importance
+temp <- yeast |> select(AreaShape_MaxFeretDiameter, AreaShape_Solidity, AreaShape_Eccentricity, AreaShape_Extent, AreaShape_Orientation, strain, uniqueWell, uniqueImage, uniqueID) |> mutate(across(where(is.numeric), scale))
+
+temp_full <- temp |> group_by(uniqueImage) |>
+   summarise(across(where(is.numeric), ~median(., na.rm = TRUE))) |>
+   column_to_rownames(var = "uniqueImage")
+
+# wrap it all together
+
 dist_matrix <- dist(temp_full)
 
 hc_result <- hclust(dist_matrix, method = "average")
@@ -207,8 +318,8 @@ heatmap.2(as.matrix(temp_full),scale="none",trace="none",
 temp_filtered <- temp |> filter(uniqueWell == "C-03")
 colnames(temp_filtered)
 
-temp_filtered |> ggplot(aes(x = AreaShape_Perimeter, y = uniqueImage)) + geom_boxplot()
-summary(aov(AreaShape_Perimeter ~ uniqueImage, data = temp_filtered))
+temp_filtered |> ggplot(aes(x = AreaShape_MeanRadius, y = uniqueImage)) + geom_boxplot()
+summary(aov(AreaShape_MeanRadius ~ uniqueImage, data = temp_filtered))
 
 temp_filtered |> ggplot(aes(x = AreaShape_FormFactor, y = uniqueImage)) + geom_boxplot()
 summary(aov(AreaShape_FormFactor ~ uniqueImage, data = temp_filtered))
@@ -229,8 +340,8 @@ summary(aov(AreaShape_Orientation ~ uniqueImage, data = temp_filtered))
 temp_filtered <- temp |> filter(uniqueWell == "C-04")
 colnames(temp_filtered)
 
-temp_filtered |> ggplot(aes(x = AreaShape_Perimeter, y = uniqueImage)) + geom_boxplot()
-summary(aov(AreaShape_Perimeter ~ uniqueImage, data = temp_filtered))
+temp_filtered |> ggplot(aes(x = AreaShape_MeanRadius, y = uniqueImage)) + geom_boxplot()
+summary(aov(AreaShape_MeanRadius ~ uniqueImage, data = temp_filtered))
 
 temp_filtered |> ggplot(aes(x = AreaShape_FormFactor, y = uniqueImage)) + geom_boxplot()
 summary(aov(AreaShape_FormFactor ~ uniqueImage, data = temp_filtered))
@@ -251,8 +362,8 @@ summary(aov(AreaShape_Orientation ~ uniqueImage, data = temp_filtered))
 temp_filtered <- temp |> filter(uniqueWell == "D-03")
 colnames(temp_filtered)
 
-temp_filtered |> ggplot(aes(x = AreaShape_Perimeter, y = uniqueImage)) + geom_boxplot()
-summary(aov(AreaShape_Perimeter ~ uniqueImage, data = temp_filtered))
+temp_filtered |> ggplot(aes(x = AreaShape_MeanRadius, y = uniqueImage)) + geom_boxplot()
+summary(aov(AreaShape_MeanRadius ~ uniqueImage, data = temp_filtered))
 
 temp_filtered |> ggplot(aes(x = AreaShape_FormFactor, y = uniqueImage)) + geom_boxplot()
 summary(aov(AreaShape_FormFactor ~ uniqueImage, data = temp_filtered))
@@ -273,8 +384,8 @@ summary(aov(AreaShape_Orientation ~ uniqueImage, data = temp_filtered))
 temp_filtered <- temp |> filter(uniqueWell == "D-04")
 colnames(temp_filtered)
 
-temp_filtered |> ggplot(aes(x = AreaShape_Perimeter, y = uniqueImage)) + geom_boxplot()
-summary(aov(AreaShape_Perimeter ~ uniqueImage, data = temp_filtered))
+temp_filtered |> ggplot(aes(x = AreaShape_MeanRadius, y = uniqueImage)) + geom_boxplot()
+summary(aov(AreaShape_MeanRadius ~ uniqueImage, data = temp_filtered))
 
 temp_filtered |> ggplot(aes(x = AreaShape_FormFactor, y = uniqueImage)) + geom_boxplot()
 summary(aov(AreaShape_FormFactor ~ uniqueImage, data = temp_filtered))
@@ -295,8 +406,8 @@ summary(aov(AreaShape_Orientation ~ uniqueImage, data = temp_filtered))
 temp_filtered <- temp |> filter(uniqueWell == "E-03")
 colnames(temp_filtered)
 
-temp_filtered |> ggplot(aes(x = AreaShape_Perimeter, y = uniqueImage)) + geom_boxplot()
-summary(aov(AreaShape_Perimeter ~ uniqueImage, data = temp_filtered))
+temp_filtered |> ggplot(aes(x = AreaShape_MeanRadius, y = uniqueImage)) + geom_boxplot()
+summary(aov(AreaShape_MeanRadius ~ uniqueImage, data = temp_filtered))
 
 temp_filtered |> ggplot(aes(x = AreaShape_FormFactor, y = uniqueImage)) + geom_boxplot()
 summary(aov(AreaShape_FormFactor ~ uniqueImage, data = temp_filtered))
@@ -317,8 +428,8 @@ summary(aov(AreaShape_Orientation ~ uniqueImage, data = temp_filtered))
 temp_filtered <- temp |> filter(uniqueWell == "E-04")
 colnames(temp_filtered)
 
-temp_filtered |> ggplot(aes(x = AreaShape_Perimeter, y = uniqueImage)) + geom_boxplot()
-summary(aov(AreaShape_Perimeter ~ uniqueImage, data = temp_filtered))
+temp_filtered |> ggplot(aes(x = AreaShape_MeanRadius, y = uniqueImage)) + geom_boxplot()
+summary(aov(AreaShape_MeanRadius ~ uniqueImage, data = temp_filtered))
 
 temp_filtered |> ggplot(aes(x = AreaShape_FormFactor, y = uniqueImage)) + geom_boxplot()
 summary(aov(AreaShape_FormFactor ~ uniqueImage, data = temp_filtered))
@@ -339,8 +450,8 @@ summary(aov(AreaShape_Orientation ~ uniqueImage, data = temp_filtered))
 temp_filtered <- temp |> filter(strain == "C")
 colnames(temp_filtered)
 
-temp_filtered |> ggplot(aes(x = AreaShape_Perimeter, y = uniqueWell)) + geom_boxplot()
-summary(aov(AreaShape_Perimeter ~ uniqueWell, data = temp_filtered))
+temp_filtered |> ggplot(aes(x = AreaShape_MeanRadius, y = uniqueWell)) + geom_boxplot()
+summary(aov(AreaShape_MeanRadius ~ uniqueWell, data = temp_filtered))
 
 temp_filtered |> ggplot(aes(x = AreaShape_FormFactor, y = uniqueWell)) + geom_boxplot()
 summary(aov(AreaShape_FormFactor ~ uniqueWell, data = temp_filtered))
@@ -361,8 +472,8 @@ summary(aov(AreaShape_Orientation ~ uniqueWell, data = temp_filtered))
 temp_filtered <- temp |> filter(strain == "D")
 colnames(temp_filtered)
 
-temp_filtered |> ggplot(aes(x = AreaShape_Perimeter, y = uniqueWell)) + geom_boxplot()
-summary(aov(AreaShape_Perimeter ~ uniqueWell, data = temp_filtered))
+temp_filtered |> ggplot(aes(x = AreaShape_MeanRadius, y = uniqueWell)) + geom_boxplot()
+summary(aov(AreaShape_MeanRadius ~ uniqueWell, data = temp_filtered))
 
 temp_filtered |> ggplot(aes(x = AreaShape_FormFactor, y = uniqueWell)) + geom_boxplot()
 summary(aov(AreaShape_FormFactor ~ uniqueWell, data = temp_filtered))
@@ -383,8 +494,8 @@ summary(aov(AreaShape_Orientation ~ uniqueWell, data = temp_filtered))
 temp_filtered <- temp |> filter(strain == "E")
 colnames(temp_filtered)
 
-temp_filtered |> ggplot(aes(x = AreaShape_Perimeter, y = uniqueWell)) + geom_boxplot()
-summary(aov(AreaShape_Perimeter ~ uniqueWell, data = temp_filtered))
+temp_filtered |> ggplot(aes(x = AreaShape_MeanRadius, y = uniqueWell)) + geom_boxplot()
+summary(aov(AreaShape_MeanRadius ~ uniqueWell, data = temp_filtered))
 
 temp_filtered |> ggplot(aes(x = AreaShape_FormFactor, y = uniqueWell)) + geom_boxplot()
 summary(aov(AreaShape_FormFactor ~ uniqueWell, data = temp_filtered))
