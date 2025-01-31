@@ -29,8 +29,6 @@ data_scaled <- data.frame(scale(y[, sapply(y, is.numeric)])) |> select(!c(Locati
 
 # 1. Grouping/Clustering
 
-The pdf shared in class (also in the data folder) does a better job then I will ever do for this
-
 ```{r}
 pc_scores <- pca$x[, 1:6]
 pc_scores_new <- data.frame(pc_scores) |> rownames_to_column(var = "rowname") |>
