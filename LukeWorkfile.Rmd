@@ -146,6 +146,8 @@ heatmap.2(as.matrix(temp_sum),scale="none",trace="none",
 ```
 
 ```{r}
+#| label: C-03-well-examination
+
 temp_filtered <- temp |> filter(uniqueWell == "C-03")
 colnames(temp_filtered)
 
@@ -165,3 +167,178 @@ temp_filtered |> ggplot(aes(x = AreaShape_Orientation, y = uniqueImage)) + geom_
 summary(aov(AreaShape_Orientation ~ uniqueImage, data = temp_filtered))
 ```
 
+```{r}
+#| label: C-04-well-examination
+
+temp_filtered <- temp |> filter(uniqueWell == "C-04")
+colnames(temp_filtered)
+
+temp_filtered |> ggplot(aes(x = AreaShape_Perimeter, y = uniqueImage)) + geom_boxplot()
+summary(aov(AreaShape_Perimeter ~ uniqueImage, data = temp_filtered))
+
+temp_filtered |> ggplot(aes(x = AreaShape_FormFactor, y = uniqueImage)) + geom_boxplot()
+summary(aov(AreaShape_FormFactor ~ uniqueImage, data = temp_filtered))
+
+temp_filtered |> ggplot(aes(x = AreaShape_Eccentricity, y = uniqueImage)) + geom_boxplot()
+summary(aov(AreaShape_Eccentricity ~ uniqueImage, data = temp_filtered))
+
+temp_filtered |> ggplot(aes(x = AreaShape_Extent, y = uniqueImage)) + geom_boxplot()
+summary(aov(AreaShape_Extent ~ uniqueImage, data = temp_filtered))
+
+temp_filtered |> ggplot(aes(x = AreaShape_Orientation, y = uniqueImage)) + geom_boxplot()
+summary(aov(AreaShape_Orientation ~ uniqueImage, data = temp_filtered))
+```
+
+```{r}
+#| label: D-03-well-examination
+
+temp_filtered <- temp |> filter(uniqueWell == "D-03")
+colnames(temp_filtered)
+
+temp_filtered |> ggplot(aes(x = AreaShape_Perimeter, y = uniqueImage)) + geom_boxplot()
+summary(aov(AreaShape_Perimeter ~ uniqueImage, data = temp_filtered))
+
+temp_filtered |> ggplot(aes(x = AreaShape_FormFactor, y = uniqueImage)) + geom_boxplot()
+summary(aov(AreaShape_FormFactor ~ uniqueImage, data = temp_filtered))
+
+temp_filtered |> ggplot(aes(x = AreaShape_Eccentricity, y = uniqueImage)) + geom_boxplot()
+summary(aov(AreaShape_Eccentricity ~ uniqueImage, data = temp_filtered))
+
+temp_filtered |> ggplot(aes(x = AreaShape_Extent, y = uniqueImage)) + geom_boxplot()
+summary(aov(AreaShape_Extent ~ uniqueImage, data = temp_filtered))
+
+temp_filtered |> ggplot(aes(x = AreaShape_Orientation, y = uniqueImage)) + geom_boxplot()
+summary(aov(AreaShape_Orientation ~ uniqueImage, data = temp_filtered))
+```
+
+```{r}
+#| label: D-04-well-examination
+
+temp_filtered <- temp |> filter(uniqueWell == "D-04")
+colnames(temp_filtered)
+
+temp_filtered |> ggplot(aes(x = AreaShape_Perimeter, y = uniqueImage)) + geom_boxplot()
+summary(aov(AreaShape_Perimeter ~ uniqueImage, data = temp_filtered))
+
+temp_filtered |> ggplot(aes(x = AreaShape_FormFactor, y = uniqueImage)) + geom_boxplot()
+summary(aov(AreaShape_FormFactor ~ uniqueImage, data = temp_filtered))
+
+temp_filtered |> ggplot(aes(x = AreaShape_Eccentricity, y = uniqueImage)) + geom_boxplot()
+summary(aov(AreaShape_Eccentricity ~ uniqueImage, data = temp_filtered))
+
+temp_filtered |> ggplot(aes(x = AreaShape_Extent, y = uniqueImage)) + geom_boxplot()
+summary(aov(AreaShape_Extent ~ uniqueImage, data = temp_filtered))
+
+temp_filtered |> ggplot(aes(x = AreaShape_Orientation, y = uniqueImage)) + geom_boxplot()
+summary(aov(AreaShape_Orientation ~ uniqueImage, data = temp_filtered))
+```
+
+```{r}
+#| label: E-03-well-examination
+
+temp_filtered <- temp |> filter(uniqueWell == "E-03")
+colnames(temp_filtered)
+
+temp_filtered |> ggplot(aes(x = AreaShape_Perimeter, y = uniqueImage)) + geom_boxplot()
+summary(aov(AreaShape_Perimeter ~ uniqueImage, data = temp_filtered))
+
+temp_filtered |> ggplot(aes(x = AreaShape_FormFactor, y = uniqueImage)) + geom_boxplot()
+summary(aov(AreaShape_FormFactor ~ uniqueImage, data = temp_filtered))
+
+temp_filtered |> ggplot(aes(x = AreaShape_Eccentricity, y = uniqueImage)) + geom_boxplot()
+summary(aov(AreaShape_Eccentricity ~ uniqueImage, data = temp_filtered))
+
+temp_filtered |> ggplot(aes(x = AreaShape_Extent, y = uniqueImage)) + geom_boxplot()
+summary(aov(AreaShape_Extent ~ uniqueImage, data = temp_filtered))
+
+temp_filtered |> ggplot(aes(x = AreaShape_Orientation, y = uniqueImage)) + geom_boxplot()
+summary(aov(AreaShape_Orientation ~ uniqueImage, data = temp_filtered))
+```
+
+```{r}
+#| label: E-04-well-examination
+
+temp_filtered <- temp |> filter(uniqueWell == "E-04")
+colnames(temp_filtered)
+
+temp_filtered |> ggplot(aes(x = AreaShape_Perimeter, y = uniqueImage)) + geom_boxplot()
+summary(aov(AreaShape_Perimeter ~ uniqueImage, data = temp_filtered))
+
+temp_filtered |> ggplot(aes(x = AreaShape_FormFactor, y = uniqueImage)) + geom_boxplot()
+summary(aov(AreaShape_FormFactor ~ uniqueImage, data = temp_filtered))
+
+temp_filtered |> ggplot(aes(x = AreaShape_Eccentricity, y = uniqueImage)) + geom_boxplot()
+summary(aov(AreaShape_Eccentricity ~ uniqueImage, data = temp_filtered))
+
+temp_filtered |> ggplot(aes(x = AreaShape_Extent, y = uniqueImage)) + geom_boxplot()
+summary(aov(AreaShape_Extent ~ uniqueImage, data = temp_filtered))
+
+temp_filtered |> ggplot(aes(x = AreaShape_Orientation, y = uniqueImage)) + geom_boxplot()
+summary(aov(AreaShape_Orientation ~ uniqueImage, data = temp_filtered))
+```
+
+```{r}
+#| label: C-strain-examination
+
+temp_filtered <- temp |> filter(strain == "C")
+colnames(temp_filtered)
+
+temp_filtered |> ggplot(aes(x = AreaShape_Perimeter, y = uniqueWell)) + geom_boxplot()
+summary(aov(AreaShape_Perimeter ~ uniqueWell, data = temp_filtered))
+
+temp_filtered |> ggplot(aes(x = AreaShape_FormFactor, y = uniqueWell)) + geom_boxplot()
+summary(aov(AreaShape_FormFactor ~ uniqueWell, data = temp_filtered))
+
+temp_filtered |> ggplot(aes(x = AreaShape_Eccentricity, y = uniqueWell)) + geom_boxplot()
+summary(aov(AreaShape_Eccentricity ~ uniqueWell, data = temp_filtered))
+
+temp_filtered |> ggplot(aes(x = AreaShape_Extent, y = uniqueWell)) + geom_boxplot()
+summary(aov(AreaShape_Extent ~ uniqueWell, data = temp_filtered))
+
+temp_filtered |> ggplot(aes(x = AreaShape_Orientation, y = uniqueWell)) + geom_boxplot()
+summary(aov(AreaShape_Orientation ~ uniqueWell, data = temp_filtered))
+```
+
+```{r}
+#| label: D-strain-examination
+
+temp_filtered <- temp |> filter(strain == "D")
+colnames(temp_filtered)
+
+temp_filtered |> ggplot(aes(x = AreaShape_Perimeter, y = uniqueWell)) + geom_boxplot()
+summary(aov(AreaShape_Perimeter ~ uniqueWell, data = temp_filtered))
+
+temp_filtered |> ggplot(aes(x = AreaShape_FormFactor, y = uniqueWell)) + geom_boxplot()
+summary(aov(AreaShape_FormFactor ~ uniqueWell, data = temp_filtered))
+
+temp_filtered |> ggplot(aes(x = AreaShape_Eccentricity, y = uniqueWell)) + geom_boxplot()
+summary(aov(AreaShape_Eccentricity ~ uniqueWell, data = temp_filtered))
+
+temp_filtered |> ggplot(aes(x = AreaShape_Extent, y = uniqueWell)) + geom_boxplot()
+summary(aov(AreaShape_Extent ~ uniqueWell, data = temp_filtered))
+
+temp_filtered |> ggplot(aes(x = AreaShape_Orientation, y = uniqueWell)) + geom_boxplot()
+summary(aov(AreaShape_Orientation ~ uniqueWell, data = temp_filtered))
+```
+
+```{r}
+#| label: E-strain-examination
+
+temp_filtered <- temp |> filter(strain == "E")
+colnames(temp_filtered)
+
+temp_filtered |> ggplot(aes(x = AreaShape_Perimeter, y = uniqueWell)) + geom_boxplot()
+summary(aov(AreaShape_Perimeter ~ uniqueWell, data = temp_filtered))
+
+temp_filtered |> ggplot(aes(x = AreaShape_FormFactor, y = uniqueWell)) + geom_boxplot()
+summary(aov(AreaShape_FormFactor ~ uniqueWell, data = temp_filtered))
+
+temp_filtered |> ggplot(aes(x = AreaShape_Eccentricity, y = uniqueWell)) + geom_boxplot()
+summary(aov(AreaShape_Eccentricity ~ uniqueWell, data = temp_filtered))
+
+temp_filtered |> ggplot(aes(x = AreaShape_Extent, y = uniqueWell)) + geom_boxplot()
+summary(aov(AreaShape_Extent ~ uniqueWell, data = temp_filtered))
+
+temp_filtered |> ggplot(aes(x = AreaShape_Orientation, y = uniqueWell)) + geom_boxplot()
+summary(aov(AreaShape_Orientation ~ uniqueWell, data = temp_filtered))
+```
