@@ -131,20 +131,26 @@ covariance |> kable(digits = 2)
 ```{r}
 #| label: new-cluster-analysis
 
-temp <- yeast |> select(AreaShape_Perimeter, AreaShape_FormFactor, AreaShape_Eccentricity, AreaShape_Extent, strain, uniqueWell, uniqueImage, uniqueID) |> mutate(across(where(is.numeric), scale))
+temp <- yeast |> select(AreaShape_Perimeter, AreaShape_FormFactor, AreaShape_Eccentricity, AreaShape_Extent, AreaShape_Orientation, strain, uniqueWell, uniqueImage, uniqueID) |> mutate(across(where(is.numeric), scale))
 
-temp_orientation <- yeast |> select(AreaShape_Orientation, strain, uniqueWell, uniqueImage, uniqueID) |> mutate(across(where(is.numeric), scale))
+temp_full <- temp |> group_by(uniqueImage) |>
+   summarise(across(where(is.numeric), ~median(., na.rm = TRUE))) |>
+   column_to_rownames(var = "uniqueImage")
 
-temp_sum <- temp |> group_by(uniqueImage) |>
-  summarise(across(where(is.numeric), ~median(., na.rm = TRUE))) |>
-  mutate(uniqueWell = substring(uniqueImage, 0, 4))
-
-temp_orientation_sum <- temp_orientation |> group_by(uniqueWell) |>
-  summarise(across(where(is.numeric), ~median(., na.rm = TRUE)))
-
-temp_full <- left_join(temp_sum, temp_orientation_sum, by = c("uniqueWell" = "uniqueWell")) |>
-  column_to_rownames(var = "uniqueImage") |>
-  select(!uniqueWell)
+# temp <- yeast |> select(AreaShape_Perimeter, AreaShape_FormFactor, AreaShape_Eccentricity, AreaShape_Extent, strain, uniqueWell, uniqueImage, uniqueID) |> mutate(across(where(is.numeric), scale))
+# 
+# temp_orientation <- yeast |> select(AreaShape_Orientation, strain, uniqueWell, uniqueImage, uniqueID) |> mutate(across(where(is.numeric), scale))
+# 
+# temp_sum <- temp |> group_by(uniqueImage) |>
+#   summarise(across(where(is.numeric), ~median(., na.rm = TRUE))) |>
+#   mutate(uniqueWell = substring(uniqueImage, 0, 4))
+# 
+# temp_orientation_sum <- temp_orientation |> group_by(uniqueWell) |>
+#   summarise(across(where(is.numeric), ~median(., na.rm = TRUE)))
+# 
+# temp_full <- left_join(temp_sum, temp_orientation_sum, by = c("uniqueWell" = "uniqueWell")) |>
+#   column_to_rownames(var = "uniqueImage") |>
+#   select(!uniqueWell)
 
 dist_matrix <- dist(temp_full)
 
