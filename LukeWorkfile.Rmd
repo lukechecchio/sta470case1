@@ -131,17 +131,27 @@ covariance |> kable(digits = 2)
 ```{r}
 #| label: new-cluster-analysis
 
-temp <- yeast |> select(AreaShape_Perimeter, AreaShape_FormFactor, AreaShape_Eccentricity, AreaShape_Extent, AreaShape_Orientation, strain, uniqueWell, uniqueImage, uniqueID) |> mutate(across(where(is.numeric), scale))
+temp <- yeast |> select(AreaShape_Perimeter, AreaShape_FormFactor, AreaShape_Eccentricity, AreaShape_Extent, strain, uniqueWell, uniqueImage, uniqueID) |> mutate(across(where(is.numeric), scale))
+
+temp_orientation <- yeast |> select(AreaShape_Orientation, strain, uniqueWell, uniqueImage, uniqueID) |> mutate(across(where(is.numeric), scale))
 
 temp_sum <- temp |> group_by(uniqueImage) |>
   summarise(across(where(is.numeric), ~median(., na.rm = TRUE))) |>
-  column_to_rownames(var = "uniqueImage")
-dist_matrix <- dist(temp_sum)
+  mutate(uniqueWell = substring(uniqueImage, 0, 4))
+
+temp_orientation_sum <- temp_orientation |> group_by(uniqueWell) |>
+  summarise(across(where(is.numeric), ~median(., na.rm = TRUE)))
+
+temp_full <- left_join(temp_sum, temp_orientation_sum, by = c("uniqueWell" = "uniqueWell")) |>
+  column_to_rownames(var = "uniqueImage") |>
+  select(!uniqueWell)
+
+dist_matrix <- dist(temp_full)
 
 hc_result <- hclust(dist_matrix, method = "average")
 plot(hc_result, main = "Hierarchical Clustering on Important Features", xlab = "", sub = "")
 
-heatmap.2(as.matrix(temp_sum),scale="none",trace="none",
+heatmap.2(as.matrix(temp_full),scale="none",trace="none",
           cexCol=1)
 ```
 
