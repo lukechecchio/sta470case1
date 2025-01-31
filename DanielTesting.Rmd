@@ -1,0 +1,20 @@
+```{r}
+library(lme4)
+library(performance)
+
+# Function to compute ICC for a variable
+compute_icc <- function(var_name) {
+  formula <- as.formula(paste(var_name, "~ 1 + (1 | uniqueWell)"))
+  model <- lmer(formula, data = y)
+  icc <- icc(model)
+  return(data.frame(Variable = var_name, ICC = icc))
+}
+
+# Apply to all numeric variables
+numeric_vars <- names(y)[sapply(y, is.numeric)]
+icc_results <- do.call(rbind, lapply(numeric_vars, compute_icc))
+
+# Sort by ICC (highest first)
+icc_results <- icc_results[order(-icc_results$ICC), ]
+print(icc_results)
+```
