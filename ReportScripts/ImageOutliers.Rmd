@@ -1,0 +1,3 @@
+# fit LMER models on different features; strain, image as random effect - identify outlier images from size of random effects
+# separate into two buckets - metrics informative for image quality and images informative for phenotype (might not be here)
+# can also use basic EDA from presentation here

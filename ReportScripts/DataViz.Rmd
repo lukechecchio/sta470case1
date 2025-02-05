@@ -1,0 +1,1 @@
+# after detecting outliers, selecting variables, etc. use PCA, bi-clustered heatmaps to visualize and summarize data
