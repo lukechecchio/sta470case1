@@ -21,3 +21,79 @@ data_scaled <- data.frame(scale(y[, sapply(y, is.numeric)]))
 yeast |> group_by(uniqueImage) |> summarize(n = n())
 ```
 
+```{r}
+#| label: summary-metric-investigation
+
+yeast_clean <- yeast |> select(!(all_of(drop))) |> filter(!(uniqueImage %in% c("C-03-1.2", "C-03-1.3", "C-03-2.1", "D-03-1.1", "D-03-1.2", "D-03-2.1")))
+
+# median for important variables
+
+medians <- yeast_clean |> group_by(uniqueImage) |> summarize(med_ff = median(AreaShape_FormFactor),
+                                            med_co = median(AreaShape_Compactness),
+                                            med_or = median(AreaShape_Orientation),
+                                            med_so = median(AreaShape_Solidity),
+                                            med_ec = median(AreaShape_Eccentricity))
+means <- yeast_clean |> group_by(uniqueImage) |> summarize(mean_ff = mean(AreaShape_FormFactor),
+                                            mean_co = mean(AreaShape_Compactness),
+                                            mean_or = mean(AreaShape_Orientation),
+                                            mean_so = mean(AreaShape_Solidity),
+                                            mean_ec = mean(AreaShape_Eccentricity))
+sds <- yeast_clean |> group_by(uniqueImage) |> summarize(sd_ff = sd(AreaShape_FormFactor),
+                                            sd_co = sd(AreaShape_Compactness),
+                                            sd_or = sd(AreaShape_Orientation),
+                                            sd_so = sd(AreaShape_Solidity),
+                                            sd_ec = sd(AreaShape_Eccentricity))
+q1s <- yeast_clean |> group_by(uniqueImage) |> summarize(q1_ff = quantile(AreaShape_FormFactor, 0.25),
+                                            q1_co = quantile(AreaShape_Compactness, 0.25),
+                                            q1_or = quantile(AreaShape_Orientation, 0.25),
+                                            q1_so = quantile(AreaShape_Solidity, 0.25),
+                                            q1_ec = quantile(AreaShape_Eccentricity, 0.25))
+q3s <- yeast_clean |> group_by(uniqueImage) |> summarize(q3_ff = quantile(AreaShape_FormFactor, 0.75),
+                                            q3_co = quantile(AreaShape_Compactness, 0.75),
+                                            q3_or = quantile(AreaShape_Orientation, 0.75),
+                                            q3_so = quantile(AreaShape_Solidity, 0.75),
+                                            q3_ec = quantile(AreaShape_Eccentricity, 0.75))
+
+big_sum <- yeast_clean |> group_by(uniqueImage) |> summarize(
+                                            med_ff = median(AreaShape_FormFactor),
+                                            med_co = median(AreaShape_Compactness),
+                                            # med_or = median(AreaShape_Orientation),
+                                            med_so = median(AreaShape_Solidity),
+                                            med_ec = median(AreaShape_Eccentricity),
+                                            mean_ff = mean(AreaShape_FormFactor),
+                                            mean_co = mean(AreaShape_Compactness),
+                                            # mean_or = mean(AreaShape_Orientation),
+                                            mean_so = mean(AreaShape_Solidity),
+                                            mean_ec = mean(AreaShape_Eccentricity),
+                                            sd_ff = sd(AreaShape_FormFactor),
+                                            sd_co = sd(AreaShape_Compactness),
+                                            # sd_or = sd(AreaShape_Orientation),
+                                            sd_so = sd(AreaShape_Solidity),
+                                            sd_ec = sd(AreaShape_Eccentricity),
+                                            q1_ff = quantile(AreaShape_FormFactor, 0.25),
+                                            q1_co = quantile(AreaShape_Compactness, 0.25),
+                                            # q1_or = quantile(AreaShape_Orientation, 0.25),
+                                            q1_so = quantile(AreaShape_Solidity, 0.25),
+                                            q1_ec = quantile(AreaShape_Eccentricity, 0.25),
+                                            q3_ff = quantile(AreaShape_FormFactor, 0.75),
+                                            q3_co = quantile(AreaShape_Compactness, 0.75),
+                                            # q3_or = quantile(AreaShape_Orientation, 0.75),
+                                            q3_so = quantile(AreaShape_Solidity, 0.75),
+                                            q3_ec = quantile(AreaShape_Eccentricity, 0.75)
+                                            )
+```
+
+```{r}
+#| label: test-for-relevance
+
+temp <- big_sum |> mutate(across(where(is.numeric), scale)) |> column_to_rownames(var = "uniqueImage")
+
+dist_matrix <- dist(temp)
+
+hc_result <- hclust(dist_matrix, method = "complete")
+plot(hc_result, main = "Hierarchical Clustering on Important Features", xlab = "", sub = "")
+
+heatmap.2(as.matrix(temp),scale="none",trace="none",
+          cexCol=1)
+```
+
