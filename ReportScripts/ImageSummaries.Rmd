@@ -1,1 +1,23 @@
 # find metrics to summarize images (means, medians, sds, quartiles, etc.)
+
+```{r}
+#| label: package-data-load
+
+library(tidyverse)
+library(knitr) 
+library(ggfortify)
+library(gplots)
+
+load("../data/yeast.RData")
+
+yeast <- y |> select(!c(Location_Center_X, Location_Center_Y))
+
+data_scaled <- data.frame(scale(y[, sapply(y, is.numeric)]))
+```
+
+```{r}
+#| label: image-investigation
+
+yeast |> group_by(uniqueImage) |> summarize(n = n())
+```
+
