@@ -7,6 +7,8 @@ library(tidyverse)
 library(knitr) 
 library(ggfortify)
 library(gplots)
+library(moments)
+library(plotly)
 
 load("../data/yeast.RData")
 
@@ -26,60 +28,82 @@ yeast |> group_by(uniqueImage) |> summarize(n = n())
 
 yeast_clean <- yeast |> select(!(all_of(drop))) |> filter(!(uniqueImage %in% c("C-03-1.2", "C-03-1.3", "C-03-2.1", "D-03-1.1", "D-03-1.2", "D-03-2.1")))
 
-# median for important variables
+# summary stats for important variables
 
 medians <- yeast_clean |> group_by(uniqueImage) |> summarize(med_ff = median(AreaShape_FormFactor),
                                             med_co = median(AreaShape_Compactness),
                                             med_or = median(AreaShape_Orientation),
+                                            med_mal = median(AreaShape_MinorAxisLength),
                                             med_so = median(AreaShape_Solidity),
-                                            med_ec = median(AreaShape_Eccentricity))
+                                            med_ex = median(AreaShape_Extent))
 means <- yeast_clean |> group_by(uniqueImage) |> summarize(mean_ff = mean(AreaShape_FormFactor),
                                             mean_co = mean(AreaShape_Compactness),
                                             mean_or = mean(AreaShape_Orientation),
+                                            mean_mal = mean(AreaShape_MinorAxisLength),
                                             mean_so = mean(AreaShape_Solidity),
-                                            mean_ec = mean(AreaShape_Eccentricity))
+                                            mean_ex = mean(AreaShape_Extent))
 sds <- yeast_clean |> group_by(uniqueImage) |> summarize(sd_ff = sd(AreaShape_FormFactor),
                                             sd_co = sd(AreaShape_Compactness),
                                             sd_or = sd(AreaShape_Orientation),
+                                            sd_mal = sd(AreaShape_MinorAxisLength),
                                             sd_so = sd(AreaShape_Solidity),
-                                            sd_ec = sd(AreaShape_Eccentricity))
-q1s <- yeast_clean |> group_by(uniqueImage) |> summarize(q1_ff = quantile(AreaShape_FormFactor, 0.25),
-                                            q1_co = quantile(AreaShape_Compactness, 0.25),
-                                            q1_or = quantile(AreaShape_Orientation, 0.25),
-                                            q1_so = quantile(AreaShape_Solidity, 0.25),
-                                            q1_ec = quantile(AreaShape_Eccentricity, 0.25))
-q3s <- yeast_clean |> group_by(uniqueImage) |> summarize(q3_ff = quantile(AreaShape_FormFactor, 0.75),
-                                            q3_co = quantile(AreaShape_Compactness, 0.75),
-                                            q3_or = quantile(AreaShape_Orientation, 0.75),
-                                            q3_so = quantile(AreaShape_Solidity, 0.75),
-                                            q3_ec = quantile(AreaShape_Eccentricity, 0.75))
+                                            sd_ex = sd(AreaShape_Extent))
+iqrs <- yeast_clean |> group_by(uniqueImage) |> summarize(iqr_ff = IQR(AreaShape_FormFactor),
+                                            iqr_co = IQR(AreaShape_Compactness),
+                                            iqr_or = IQR(AreaShape_Orientation),
+                                            iqr_mal = IQR(AreaShape_MinorAxisLength),
+                                            iqr_so = IQR(AreaShape_Solidity),
+                                            iqr_ex = IQR(AreaShape_Extent))
+sks <- yeast_clean |> group_by(uniqueImage) |> summarize(sk_ff = skewness(AreaShape_FormFactor),
+                                            sk_co = skewness(AreaShape_Compactness),
+                                            sk_or = skewness(AreaShape_Orientation),
+                                            sk_mal = skewness(AreaShape_MinorAxisLength),
+                                            sk_so = skewness(AreaShape_Solidity),
+                                            sk_ex = skewness(AreaShape_Extent))
+ks <- yeast_clean |> group_by(uniqueImage) |> summarize(k_ff = kurtosis(AreaShape_FormFactor),
+                                            k_co = kurtosis(AreaShape_Compactness),
+                                            k_or = kurtosis(AreaShape_Orientation),
+                                            k_mal = kurtosis(AreaShape_MinorAxisLength),
+                                            k_so = kurtosis(AreaShape_Solidity),
+                                            k_ex = kurtosis(AreaShape_Extent))
 
 big_sum <- yeast_clean |> group_by(uniqueImage) |> summarize(
                                             med_ff = median(AreaShape_FormFactor),
                                             med_co = median(AreaShape_Compactness),
-                                            # med_or = median(AreaShape_Orientation),
+                                            med_or = median(AreaShape_Orientation),
+                                            med_mal = median(AreaShape_MinorAxisLength),
                                             med_so = median(AreaShape_Solidity),
-                                            med_ec = median(AreaShape_Eccentricity),
-                                            mean_ff = mean(AreaShape_FormFactor),
-                                            mean_co = mean(AreaShape_Compactness),
+                                            med_ex = median(AreaShape_Extent),
+                                            # mean_ff = mean(AreaShape_FormFactor),
+                                            # mean_co = mean(AreaShape_Compactness),
                                             # mean_or = mean(AreaShape_Orientation),
-                                            mean_so = mean(AreaShape_Solidity),
-                                            mean_ec = mean(AreaShape_Eccentricity),
-                                            sd_ff = sd(AreaShape_FormFactor),
-                                            sd_co = sd(AreaShape_Compactness),
+                                            # mean_mal = mean(AreaShape_MinorAxisLength),
+                                            # mean_so = mean(AreaShape_Solidity),
+                                            # mean_ex = mean(AreaShape_Extent),
+                                            # sd_ff = sd(AreaShape_FormFactor),
+                                            # sd_co = sd(AreaShape_Compactness),
                                             # sd_or = sd(AreaShape_Orientation),
-                                            sd_so = sd(AreaShape_Solidity),
-                                            sd_ec = sd(AreaShape_Eccentricity),
-                                            q1_ff = quantile(AreaShape_FormFactor, 0.25),
-                                            q1_co = quantile(AreaShape_Compactness, 0.25),
-                                            # q1_or = quantile(AreaShape_Orientation, 0.25),
-                                            q1_so = quantile(AreaShape_Solidity, 0.25),
-                                            q1_ec = quantile(AreaShape_Eccentricity, 0.25),
-                                            q3_ff = quantile(AreaShape_FormFactor, 0.75),
-                                            q3_co = quantile(AreaShape_Compactness, 0.75),
-                                            # q3_or = quantile(AreaShape_Orientation, 0.75),
-                                            q3_so = quantile(AreaShape_Solidity, 0.75),
-                                            q3_ec = quantile(AreaShape_Eccentricity, 0.75)
+                                            # sd_mal = sd(AreaShape_MinorAxisLength),
+                                            # sd_so = sd(AreaShape_Solidity),
+                                            # sd_ex = sd(AreaShape_Extent),
+                                            # iqr_ff = IQR(AreaShape_FormFactor),
+                                            # iqr_co = IQR(AreaShape_Compactness),
+                                            # iqr_or = IQR(AreaShape_Orientation),
+                                            # iqr_mal = IQR(AreaShape_MinorAxisLength),
+                                            # iqr_so = IQR(AreaShape_Solidity),
+                                            # iqr_ex = IQR(AreaShape_Extent),
+                                            # sk_ff = skewness(AreaShape_FormFactor),
+                                            # sk_co = skewness(AreaShape_Compactness),
+                                            # sk_or = skewness(AreaShape_Orientation),
+                                            # sk_mal = skewness(AreaShape_MinorAxisLength),
+                                            # sk_so = skewness(AreaShape_Solidity),
+                                            # sk_ex = skewness(AreaShape_Extent),
+                                            # k_ff = kurtosis(AreaShape_FormFactor),
+                                            # k_co = kurtosis(AreaShape_Compactness),
+                                            # k_or = kurtosis(AreaShape_Orientation),
+                                            # k_mal = kurtosis(AreaShape_MinorAxisLength),
+                                            # k_so = kurtosis(AreaShape_Solidity),
+                                            # k_ex = kurtosis(AreaShape_Extent)
                                             )
 ```
 
@@ -95,5 +119,51 @@ plot(hc_result, main = "Hierarchical Clustering on Important Features", xlab = "
 
 heatmap.2(as.matrix(temp),scale="none",trace="none",
           cexCol=1)
+```
+
+```{r}
+#| label: plotting-metrics
+
+kurtoses |> mutate(Strain = substring(uniqueImage, 0, 1)) |> arrange(k_ff) |> 
+  ggplot(aes(x = reorder(uniqueImage, k_ff), y = k_ff, fill = Strain)) + 
+  geom_bar(stat = "identity") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1)) +
+  labs(x = "Image", y = "Form Factor Kurtosis")
+```
+
+```{r}
+#| label: pca
+
+yeast_clean2 <- yeast_clean |> select(AreaShape_FormFactor, AreaShape_Compactness, AreaShape_Orientation, 
+                                      AreaShape_MinorAxisLength, AreaShape_Solidity, AreaShape_Extent)
+data_scaled_new <- data.frame(scale(yeast_clean2[, sapply(yeast_clean2, is.numeric)]))
+
+pca <- prcomp(data_scaled_new, center = TRUE, scale. = TRUE)
+sum <- summary(pca)
+data.frame(sum$importance) |> select(PC1, PC2, PC3) |> kable()
+
+pca_data <- data.frame(PC1 = pca$x[,1], PC2 = pca$x[,2]) |> rownames_to_column(var = "uniqueID") |> mutate(strain = substring(uniqueID, 0, 1))
+pca_data |> ggplot(aes(x = PC1, y = PC2, color = strain)) +
+  geom_point(alpha = 0.5) +
+  labs(color = "Strain")
+
+# pca_data2 <- data.frame(PC1 = pca$x[,1], PC2 = pca$x[,2], PC3 = pca$x[,3]) |> rownames_to_column(var = "uniqueID") |> mutate(strain = substring(uniqueID, 0, 1))
+# plot_ly(pca_data2, x = ~PC1, y = ~PC2, z = ~PC3, color = ~strain, type = "scatter3d", mode = "markers")
+
+var_explained <- pca$sdev^2 / sum(pca$sdev^2)
+# sum(var_explained[1:2])
+
+# ggplot(data = data.frame(PC = 1:length(var_explained), 
+#                          Variance = var_explained),
+#        aes(x = PC, y = Variance)) +
+#   geom_line() +
+#   geom_point(size = 4) +
+#   geom_text(aes(label = round(Variance, 2)), vjust = -0.5) +
+#   scale_x_continuous(breaks = 1:length(var_explained)) +
+#   xlab("Principal Component") +
+#   ylab("Proportion of Variance Explained") +
+#   ggtitle("Scree Plot") +
+#   theme_minimal()
+
 ```
 
