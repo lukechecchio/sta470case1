@@ -1,3 +1,107 @@
 # fit LMER models on different features; strain, image as random effect - identify outlier images from size of random effects
 # separate into two buckets - metrics informative for image quality and images informative for phenotype (might not be here)
 # can also use basic EDA from presentation here
+
+```{r}
+#| label: package-data-load
+
+library(tidyverse)
+library(knitr) 
+library(ggfortify)
+library(gplots)
+library(lme4)
+library(lmerTest)
+
+load("../data/yeast.RData")
+
+yeast <- y |> select(!c(Location_Center_X, Location_Center_Y))
+
+data_scaled <- data.frame(scale(y[, sapply(y, is.numeric)]))
+```
+
+```{r}
+#| label: lmer-fit
+
+# fit mixed effects model
+
+area_me <- lmer(AreaShape_Area ~ (1 | uniqueWell) + (1 | uniqueImage), data = yeast)
+summary(area_me)
+
+# plot residuals
+
+qqnorm(resid(area_me))
+qqline(resid(area_me))
+
+# save random effects
+
+ranef <- ranef(area_me)
+well_ranef <- ranef$uniqueWell[,]
+img_ranef <- ranef$uniqueImage[,]
+
+# view image random effects
+
+ranef$uniqueImage |> arrange(desc(abs(`(Intercept)`)))
+
+# plot random effects
+
+qqnorm(img_ranef)
+qqline(img_ranef)
+boxplot(img_ranef)
+# outliers: C-03-1.1, C-03-1.2, C-03-2.1, D-03-1.2, D-03-1.3
+
+qqnorm(well_ranef)
+qqline(well_ranef)
+boxplot(well_ranef)
+# outliers: none
+
+```
+
+```{r}
+#| label: lmer-fit-updated
+
+# filter out outlier images
+
+yeast_cleaned <- yeast |> filter(!(uniqueImage %in% c("C-03-1.1", "C-03-1.2", "C-03-2.1", "D-03-1.2", "D-03-1.3")))
+
+# fit mixed effects model
+
+area_me_cleaned <- lmer(AreaShape_Area ~ (1 | uniqueWell) + (1 | uniqueImage), data = yeast_cleaned)
+summary(area_me_cleaned)
+
+# plot residuals
+
+qqnorm(resid(area_me_cleaned))
+qqline(resid(area_me_cleaned))
+
+# save random effects
+
+ranef_cleaned <- ranef(area_me_cleaned)
+well_ranef_cleaned <- ranef_cleaned$uniqueWell[,]
+img_ranef_cleaned <- ranef_cleaned$uniqueImage[,]
+
+# view image random effects
+
+ranef_cleaned$uniqueImage |> arrange(desc(abs(`(Intercept)`)))
+
+# plot random effects
+
+qqnorm(img_ranef_cleaned)
+qqline(img_ranef_cleaned)
+boxplot(img_ranef_cleaned)
+
+qqnorm(well_ranef_cleaned)
+qqline(well_ranef_cleaned)
+boxplot(well_ranef_cleaned)
+
+ranef_cleaned$uniqueWell |> arrange(desc(abs(`(Intercept)`)))
+
+```
+
+```{r}
+#| label: testing-for-significance
+
+finding_significance <- lmer(AreaShape_Solidity ~ strain + (1 | uniqueWell) + (1 | uniqueImage), data = yeast_cleaned)
+summary(finding_significance)
+
+```
+
