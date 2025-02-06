@@ -24,7 +24,7 @@ data_scaled <- data.frame(scale(y[, sapply(y, is.numeric)]))
 
 # fit mixed effects model
 
-area_me <- lmer(AreaShape_Area ~ (1 | uniqueWell) + (1 | uniqueImage), data = yeast)
+area_me <- lmer(AreaShape_Area ~ (1 | uniqueWell/uniqueImage), data = yeast)
 summary(area_me)
 
 # plot residuals
