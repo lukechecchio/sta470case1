@@ -167,3 +167,35 @@ var_explained <- pca$sdev^2 / sum(pca$sdev^2)
 
 ```
 
+```{r}
+#| label: image-pca
+
+big_sum2 <- big_sum |> column_to_rownames(var = "uniqueImage")
+sum_scaled <- data.frame(scale(big_sum2[, sapply(big_sum2, is.numeric)]))
+
+pca2 <- prcomp(sum_scaled, center = TRUE, scale. = TRUE)
+sum2 <- summary(pca2)
+data.frame(sum2$importance) |> select(PC1, PC2, PC3) |> kable()
+
+pca_data2 <- data.frame(PC1 = pca2$x[,1], PC2 = pca2$x[,2]) |> rownames_to_column(var = "uniqueImage") |> mutate(strain = substring(uniqueImage, 0, 1))
+pca_data2 |> ggplot(aes(x = PC1, y = PC2, color = strain)) +
+  geom_point() +
+  labs(color = "Strain")
+```
+
+```{r}
+#| label: image-heatmap
+
+loadings <- data.frame(pca2$x[,1:3]) |> mutate(across(where(is.numeric), scale))
+
+dist_matrix2 <- dist(loadings)
+
+hc_result2 <- hclust(dist_matrix2, method = "complete")
+plot(hc_result2, main = "Hierarchical Clustering on Principal Components", xlab = "", sub = "")
+
+heatmap.2(as.matrix(loadings),scale="none",trace="none",
+          cexCol=1)
+
+summary(pca2)$importance
+```
+
