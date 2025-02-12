@@ -124,7 +124,7 @@ heatmap.2(as.matrix(temp),scale="none",trace="none",
 ```{r}
 #| label: plotting-metrics
 
-kurtoses |> mutate(Strain = substring(uniqueImage, 0, 1)) |> arrange(k_ff) |> 
+ks |> mutate(Strain = substring(uniqueImage, 0, 1)) |> arrange(k_ff) |> 
   ggplot(aes(x = reorder(uniqueImage, k_ff), y = k_ff, fill = Strain)) + 
   geom_bar(stat = "identity") +
   theme(axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1)) +
